@@ -1,0 +1,2 @@
+DB_URL: postgres://postgres:postgres@localhost/to_do 
+SECRET_KEY: teucu
