@@ -17,7 +17,7 @@ pub async fn create(new_user: web::Json<NewUserSchema>, db: DB) -> impl Responde
         .execute(&db.connection);
 
     match insert_result {
-        Ok(_) => HttpResponse::Ok(),
+        Ok(_) => HttpResponse::Created(),
         Err(_) => HttpResponse::Conflict()
     }
 }

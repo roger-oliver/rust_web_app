@@ -5,7 +5,7 @@ use bcrypt::verify;
 #[derive(Queryable, Clone, Identifiable)]
 #[table_name="users"]
 pub struct User {
-    pub id: u32,
+    pub id: i32,
     pub username: String,
     pub email: String,
     pub password: String,
