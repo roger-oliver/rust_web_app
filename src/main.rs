@@ -15,7 +15,7 @@ mod counter;
 
 use actix_cors::Cors;
 use actix_service::Service;
-use actix_web::{App, HttpResponse, HttpServer};
+use actix_web::{middleware::Logger, App, HttpResponse, HttpServer};
 use futures::future::{ok, Either};
 
 use crate::views::views_factory;
@@ -23,6 +23,9 @@ use crate::views::views_factory;
 #[actix_web::main]
 
 async fn main() -> std::io::Result<()> {
+
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
     const ALLOWED_VERSION: &'static str = include_str!("output_data.txt");
 
     let site_counter = counter::Counter{count: 0};
@@ -66,7 +69,8 @@ async fn main() -> std::io::Result<()> {
                 }
             })
             .configure(views_factory)
-            .wrap(cors);
+            .wrap(cors)
+            .wrap(Logger::new("%a %{User-Agent}i %r %s %D"));
         return app;
     })
     .bind("127.0.0.1:8080")?
