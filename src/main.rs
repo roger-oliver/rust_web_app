@@ -14,13 +14,15 @@ mod config;
 
 use actix_cors::Cors;
 use actix_service::Service;
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpResponse, HttpServer};
+use futures::future::{ok, Either};
 
 use crate::views::views_factory;
 
 #[actix_web::main]
 
 async fn main() -> std::io::Result<()> {
+    const ALLOWED_VERSION: &'static str = include_str!("output_data.txt");
     HttpServer::new(|| {
         println!("http server is starting!");
         let cors = Cors::default().allow_any_header()
@@ -28,10 +30,23 @@ async fn main() -> std::io::Result<()> {
             .allow_any_origin();
         let app = App::new()
             .wrap_fn(|req, srv| {
-                println!("it came from middleware!!! {:?}", req);
-                let future = srv.call(req);
-                async {
-                    let result = future.await?;
+                let passed: bool;
+                if req.path().contains(ALLOWED_VERSION) {
+                    passed = true;
+                } else {
+                    passed = false;
+                }
+
+                let end_result = match passed {
+                    true => Either::Left(srv.call(req)),
+                    false => {
+                        let resp = HttpResponse::NotImplemented().body(format!("only the {} API is supported", ALLOWED_VERSION));
+                        Either::Right(ok(req.into_response(resp).map_into_boxed_body()))
+                    }
+                };
+                
+                async move {
+                    let result = end_result.await?;
                     Ok(result)
                 }
             })
