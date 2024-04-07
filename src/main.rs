@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
             .allow_any_origin();
         let app = App::new()
             .wrap_fn(|req, srv| {
-                println!("{:?}", req);
+                println!("it came from middleware!!! {:?}", req);
                 let future = srv.call(req);
                 async {
                     let result = future.await?;

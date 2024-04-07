@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse};
 use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
 
 use crate::jwt::JwToken;
@@ -6,7 +6,7 @@ use crate::{
     database::DB, json_serialization::login::Login, models::user::user::User, schema::users,
 };
 
-pub async fn login(credentials: web::Json<Login>, db: DB) -> impl Responder {
+pub async fn login(credentials: web::Json<Login>, db: DB) -> HttpResponse {
     let password = credentials.password.clone();
 
     let users = users::table
@@ -14,17 +14,17 @@ pub async fn login(credentials: web::Json<Login>, db: DB) -> impl Responder {
         .load::<User>(&db.connection).unwrap();
 
     if users.len() == 0 {
-        return HttpResponse::NotFound();
+        return HttpResponse::NotFound().body("invalid credentials");
     } else if users.len() > 1 {
-        return HttpResponse::Conflict();
+        return HttpResponse::Conflict().finish();
     }
 
     match users[0].verify(password) {
         true => {
             let token = JwToken::new(users[0].id);
             let raw_token = token.encode();
-            HttpResponse::Ok().append_header(("token", raw_token)).take()
+            HttpResponse::Ok().append_header(("token", raw_token)).finish()
         },
-        false => HttpResponse::Unauthorized()
+        false => HttpResponse::Unauthorized().finish()
     }
 }
