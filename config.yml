@@ -1,3 +1,4 @@
 DB_URL: postgres://postgres:postgres@localhost/to_do 
 SECRET_KEY: teucu
-EXPIRE_TOKEN_IN_MINUTES: 10
+EXPIRE_TOKEN_IN_MINUTES: 60
+REDIS_URL: redis://127.0.0.1/

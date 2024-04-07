@@ -11,6 +11,7 @@ mod database;
 mod models;
 mod schema;
 mod config;
+mod counter;
 
 use actix_cors::Cors;
 use actix_service::Service;
@@ -23,6 +24,11 @@ use crate::views::views_factory;
 
 async fn main() -> std::io::Result<()> {
     const ALLOWED_VERSION: &'static str = include_str!("output_data.txt");
+
+    let site_counter = counter::Counter{count: 0};
+
+    let _ = site_counter.save();
+
     HttpServer::new(|| {
         println!("http server is starting!");
         let cors = Cors::default().allow_any_header()
@@ -31,6 +37,15 @@ async fn main() -> std::io::Result<()> {
         let app = App::new()
             .wrap_fn(|req, srv| {
                 let passed: bool;
+
+                let mut site_counter = counter::Counter::load().unwrap();
+
+                site_counter.count += 1;
+
+                println!("{:?}", &site_counter);
+
+                let _ = site_counter.save();
+
                 if req.path().contains(ALLOWED_VERSION) {
                     passed = true;
                 } else {
