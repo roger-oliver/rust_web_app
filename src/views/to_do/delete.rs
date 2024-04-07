@@ -12,7 +12,7 @@ use crate::{
     schema::to_do,
 };
 
-pub async fn delete(to_do_item: web::Json<ToDoItem>, token: JwToken) -> HttpResponse {
+pub async fn delete(to_do_item: web::Json<ToDoItem>, _: JwToken) -> HttpResponse {
     let conn = establish_connection();
 
     let items = to_do::table

@@ -9,7 +9,7 @@ use crate::{
     schema::to_do,
 };
 
-pub async fn edit(to_do_item: web::Json<ToDoItem>, token: JwToken, db: DB) -> HttpResponse {
+pub async fn edit(to_do_item: web::Json<ToDoItem>, _: JwToken, db: DB) -> HttpResponse {
 
     let results = to_do::table.filter(to_do::columns::title.eq(&to_do_item.title));
 

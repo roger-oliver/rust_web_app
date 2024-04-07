@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use actix_web::{web, HttpResponse};
 use diesel::{QueryDsl, ExpressionMethods, RunQueryDsl};
 
@@ -23,7 +25,9 @@ pub async fn login(credentials: web::Json<Login>, db: DB) -> HttpResponse {
         true => {
             let token = JwToken::new(users[0].id);
             let raw_token = token.encode();
-            HttpResponse::Ok().append_header(("token", raw_token)).finish()
+            let mut body = HashMap::new();
+            body.insert("token", raw_token);
+            HttpResponse::Ok().json(body)
         },
         false => HttpResponse::Unauthorized().finish()
     }

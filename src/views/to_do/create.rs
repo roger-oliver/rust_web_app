@@ -5,13 +5,10 @@ use diesel::{
 };
 
 use crate::{
-    database::establish_connection,
-    json_serialization::to_do_items::ToDoItems,
-    models::item::{item::Item, new_item::NewItem},
-    schema::to_do,
+    database::establish_connection, json_serialization::to_do_items::ToDoItems, jwt::JwToken, models::item::{item::Item, new_item::NewItem}, schema::to_do
 };
 
-pub async fn create(req: HttpRequest) -> HttpResponse {
+pub async fn create(req: HttpRequest, _: JwToken) -> HttpResponse {
     // let state: Map<String, Value> = read_file("./state.json");
 
     let title = req.match_info().get("title").unwrap();

@@ -57,12 +57,13 @@ impl JwToken {
         match token_result {
             Ok(data) => Ok(data.claims),
             Err(error) => {
-                let message = format!("not decoding token {:?}", error);
+                let message = format!("{}", error);
                 return Err(message);
             }
         }
     }
 }
+
 
 
 impl FromRequest for JwToken {
